@@ -32,7 +32,7 @@ resource "google_compute_firewall" "allow_http" {
     ports    = ["80"]
   }
 
-  source_ranges = ["0.0.0.0/0]
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["prometheus"]
 }
 
@@ -45,7 +45,7 @@ resource "google_compute_firewall" "deny_metrics" {
     ports    = ["9090", "9100"]
   }
 
-  source_ranges = ["0.0.0.0/0]
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["prometheus"]
 }
 
