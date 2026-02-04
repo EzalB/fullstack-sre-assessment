@@ -92,3 +92,4 @@ resource "google_compute_firewall" "allow_http_node" {
   source_tags = ["prometheus"]
   target_tags = ["node-exporter"]
 }
+
