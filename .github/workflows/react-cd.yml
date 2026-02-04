@@ -1,0 +1,61 @@
+name: React CD Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      apply_status:
+        required: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+jobs:
+  react-cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-build
+          path: codebase/rdicidr-0.1.0/build
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY }}
+          service_account: ${{ secret.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: terraform/app
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform/app
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        working-directory: terraform/app
+
+      - name: Terraform Apply
+        if: ${{ inputs.apply_status == true }}
+        run: terraform apply -input=false -auto-approve tfplan
+        working-directory: terraform/app
+
+      - name: Deploy React App to GCS
+        if: ${{ inputs.apply_status == true }}
+        run: |
+          gsutil -m rsync -r codebase/rdicidr-0.1.0/build gs://${{ secrets.GCS_BUCKET_NAME }}
