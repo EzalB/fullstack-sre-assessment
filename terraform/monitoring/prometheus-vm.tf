@@ -89,6 +89,6 @@ resource "google_compute_firewall" "allow_http_node" {
     ports    = ["9100"]
   }
 
-  source_tags = ["prometheus]
+  source_tags = ["prometheus"]
   target_tags = ["node-exporter"]
 }
