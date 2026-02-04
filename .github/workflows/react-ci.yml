@@ -6,6 +6,7 @@ on:
     types: [opened, synchronize, closed]
     paths:
       - codebase/rdicidr-0.1.0/**
+      - terraform/app/**
 
 permissions:
   contents: read
@@ -15,6 +16,9 @@ permissions:
 jobs:
   react-ci:
     runs-on: ubuntu-latest
+
+    outputs:
+      APPLY_STATUS_FLAG: ${{ steps.set_apply_flag.outputs.apply_status }}
 
     defaults:
       run:
@@ -52,4 +56,18 @@ jobs:
           name: react-build
           path: codebase/rdicidr-0.1.0/build
       
+      - name: Set Apply Status Flag
+        id: set_apply_flag
+        run: |
+          if [[ "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            echo "apply_status=true" >> $GITHUB_OUTPUT
+          else
+            echo "apply_status=false" >> $GITHUB_OUTPUT
+          fi
       
+  deploy:
+    needs: react-ci
+    uses: ./.github/workflows/react-cd.yml
+    secrets: inherit
+    with:
+      apply_status: ${{ fromJSON(needs.react-ci.outputs.APPLY_STATUS_FLAG) }}
