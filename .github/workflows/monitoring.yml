@@ -42,7 +42,7 @@ jobs:
         working-directory: terraform/monitoring
 
       - name: Terraform Apply
-        if: ${{ inputs.apply_status == true }}
+        if: github.event.pull_request.merged == true
         run: terraform apply -input=false -auto-approve tfplan
         working-directory: terraform/monitoring
 
