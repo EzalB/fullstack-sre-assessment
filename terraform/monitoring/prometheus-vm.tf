@@ -25,7 +25,7 @@ resource "google_compute_instance" "prometheus_vm" {
 
 resource "google_compute_firewall" "allow_http" {
   name    = "allow-http-firewall"
-  network = default
+  network = "default"
 
   allow {
     protocol = "tcp"
@@ -38,7 +38,7 @@ resource "google_compute_firewall" "allow_http" {
 
 resource "google_compute_firewall" "deny_metrics" {
   name    = "deny-metrics-firewall"
-  network = default
+  network = "default"
 
   allow {
     protocol = "tcp"
@@ -82,7 +82,7 @@ resource "google_compute_instance" "node_exporter_vm" {
 
 resource "google_compute_firewall" "allow_http_node" {
   name    = "allow-node-firewall"
-  network = default
+  network = "default"
 
   allow {
     protocol = "tcp"
